@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export default function Navbar() {
   return (
     <nav className="fixed top-0 left-0 w-full bg-slate-950/80 backdrop-blur-md border-b border-slate-800 z-50">
@@ -27,10 +29,12 @@ export default function Navbar() {
           </li>
         </ul>
 
-        {/* Login Button */}
-        <button className="bg-blue-600 hover:bg-blue-700 transition px-5 py-2 rounded-xl text-white font-medium">
+        <Link
+          to="/login"
+          className="bg-blue-600 hover:bg-blue-700 transition px-5 py-2 rounded-xl text-white font-medium"
+        >
           Login
-        </button>
+        </Link>
 
       </div>
     </nav>

@@ -1,6 +1,19 @@
-export default function QuickAction({ title, desc, icon }) {
+import { useNavigate } from "react-router-dom";
+
+export default function QuickAction({
+  title,
+  desc,
+  icon,
+  path,
+}) {
+
+  const navigate = useNavigate();
+
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 hover:border-blue-500 hover:scale-105 transition cursor-pointer">
+    <div
+      onClick={() => navigate(path)}
+      className="bg-slate-900 border border-slate-800 rounded-2xl p-6 hover:border-blue-500 hover:scale-105 transition cursor-pointer"
+    >
 
       <div className="text-4xl mb-4">
         {icon}

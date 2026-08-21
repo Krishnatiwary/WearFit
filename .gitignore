@@ -1,5 +1,23 @@
+# Python
 backend/venv/
-backend/.env
 __pycache__/
 *.pyc
+
+# Environment variables
+backend/.env
 .env
+.env.*
+
+# Backend uploads
+backend/uploads/*
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# ZIP / backup files
+*.zip
+
+# OS files
+.DS_Store
+Thumbs.db
