@@ -30,7 +30,7 @@ export default function LoginForm() {
     try {
       setLoading(true);
 
-      const res = await axios.post("http://127.0.0.1:8000/login", {
+      const res = await axios.post("https://wearfit-xlgs.onrender.com/login", {
         email: formData.email,
         password: formData.password,
       });

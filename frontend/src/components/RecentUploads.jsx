@@ -13,7 +13,7 @@ export default function RecentUploads() {
     try {
 
       const res = await axios.get(
-        "http://127.0.0.1:8000/clothes"
+        "https://wearfit-xlgs.onrender.com/clothes"
       );
 
       // Latest 3 uploads
@@ -43,7 +43,7 @@ export default function RecentUploads() {
           >
 
             <img
-              src={`http://127.0.0.1:8000/uploads/${cloth.image}`}
+              src={`https://wearfit-xlgs.onrender.com/uploads/${cloth.image}`}
               alt={cloth.category}
               className="w-full h-52 object-cover rounded-xl"
             />

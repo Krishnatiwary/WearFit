@@ -22,7 +22,7 @@ const occasions = [
   "Travel",
 ];
 
-const API = "http://127.0.0.1:8000";
+const API = "https://wearfit-xlgs.onrender.com";
 
 const Planner = () => {
   const [plans, setPlans] = useState(() => {

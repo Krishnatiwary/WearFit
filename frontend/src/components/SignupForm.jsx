@@ -5,8 +5,7 @@ import axios from "axios";
 export default function SignupForm() {
   
 
-  console.log("SignupForm Loaded"); // 👈 YE LINE ADD KARO
-
+  
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -27,8 +26,7 @@ export default function SignupForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Signup button clicked");
-
+    
 
     if (
       !formData.name ||
@@ -48,7 +46,7 @@ export default function SignupForm() {
     try {
       setLoading(true);
 
-      const res = await axios.post("http://127.0.0.1:8000/signup", {
+      const res = await axios.post("https://wearfit-xlgs.onrender.com/signup", {
         name: formData.name,
         email: formData.email,
         password: formData.password,

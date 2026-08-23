@@ -23,7 +23,7 @@ export default function WardrobeCard({
 
     try {
 
-      await axios.delete(`http://127.0.0.1:8000/cloth/${id}`);
+      await axios.delete(`https://wearfit-xlgs.onrender.com/cloth/${id}`);
 
       alert("Cloth deleted successfully.");
 

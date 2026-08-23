@@ -96,7 +96,7 @@ export default function Topbar() {
   try {
     // Get notification message from backend
     const res = await fetch(
-      "http://127.0.0.1:8000/notifications/daily"
+      "https://wearfit-xlgs.onrender.com/notifications/daily"
     );
 
     if (!res.ok) {

@@ -45,7 +45,7 @@ export default function Dashboard() {
   try {
 
     const res = await axios.get(
-      "http://127.0.0.1:8000/dashboard/stats"
+      "https://wearfit-xlgs.onrender.com/dashboard/stats"
     );
 
     console.log("✅ Dashboard API Response:", res.data);

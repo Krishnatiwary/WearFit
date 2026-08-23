@@ -11,7 +11,7 @@ export default function Wardrobe() {
 
   const fetchClothes = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/clothes");
+      const res = await axios.get("https://wearfit-xlgs.onrender.com/clothes");
       setClothes(res.data.data || []);
     } catch (err) {
       console.log(err);
@@ -106,7 +106,7 @@ export default function Wardrobe() {
             <WardrobeCard
               key={cloth._id}
               id={cloth._id}
-              image={`http://127.0.0.1:8000/uploads/${cloth.image}`}
+              image={`https://wearfit-xlgs.onrender.com/uploads/${cloth.image}`}
               category={cloth.category}
               color={cloth.color}
               season={cloth.season}

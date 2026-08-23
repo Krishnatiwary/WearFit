@@ -34,9 +34,9 @@ export default function Upload() {
 
     try {
       const res = await axios.post(
-        "http://127.0.0.1:8000/upload",
-        formData
-      );
+  "https://wearfit-xlgs.onrender.com/upload",
+  formData
+);
 
       alert(res.data.message);
     } catch (err) {

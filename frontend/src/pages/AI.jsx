@@ -10,7 +10,7 @@ export default function AI() {
   const [weather, setWeather] = useState(null);
   const [weatherLoading, setWeatherLoading] = useState(true);
 
-  const API = "http://127.0.0.1:8000";
+  const API = "https://wearfit-xlgs.onrender.com";
 
   // =========================================================
   // FETCH CLOTHES + WEATHER
