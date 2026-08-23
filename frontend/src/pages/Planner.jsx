@@ -15,6 +15,7 @@ const occasions = [
   "College",
   "Casual",
   "Office",
+  "Formal",
   "Party",
   "Wedding",
   "Gym",

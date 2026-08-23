@@ -115,6 +115,7 @@ export default function EditCloth() {
   <option value="College">College</option>
   <option value="Casual">Casual</option>
   <option value="Office">Office</option>
+  <option value="formal">Formal</option>
   <option value="Party">Party</option>
   <option value="Wedding">Wedding</option>
   <option value="Gym">Gym</option>

@@ -1101,6 +1101,10 @@ export default function AI() {
               Office
             </option>
 
+            <option value="Formal">
+              Formal
+            </option>
+
             <option value="Party">
               Party
             </option>
