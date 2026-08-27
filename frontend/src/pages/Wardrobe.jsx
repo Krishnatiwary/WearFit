@@ -106,7 +106,7 @@ export default function Wardrobe() {
             <WardrobeCard
               key={cloth._id}
               id={cloth._id}
-              image={`https://wearfit-xlgs.onrender.com/uploads/${cloth.image}`}
+              image={`${import.meta.env.VITE_API_URL}/uploads/${encodeURIComponent(cloth.image)}`}
               category={cloth.category}
               color={cloth.color}
               season={cloth.season}

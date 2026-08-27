@@ -10,11 +10,9 @@ export default function WardrobeCard({
   brand,
   occasion,
 }) {
-
   const navigate = useNavigate();
 
   const deleteCloth = async () => {
-
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this cloth?"
     );
@@ -22,13 +20,12 @@ export default function WardrobeCard({
     if (!confirmDelete) return;
 
     try {
-
-      await axios.delete(`https://wearfit-xlgs.onrender.com/cloth/${id}`);
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/cloth/${id}`
+      );
 
       alert("Cloth deleted successfully.");
-
       window.location.reload();
-
     } catch (err) {
       console.log(err);
       alert("Delete failed.");
@@ -40,8 +37,12 @@ export default function WardrobeCard({
 
       <img
         src={image}
-        alt="cloth"
+        alt={category || "cloth"}
         className="w-full h-64 object-cover rounded-xl"
+        onError={(e) => {
+          console.log("Image failed:", image);
+          e.currentTarget.style.display = "none";
+        }}
       />
 
       <h2 className="text-white text-xl font-bold mt-4">
@@ -61,8 +62,8 @@ export default function WardrobeCard({
       </p>
 
       <p className="text-purple-400">
-  Occasion : {occasion}
-</p>
+        Occasion : {occasion}
+      </p>
 
       <div className="flex gap-3 mt-5">
 

@@ -30,7 +30,9 @@ export default function LoginForm() {
     try {
       setLoading(true);
 
-      const res = await axios.post("https://wearfit-xlgs.onrender.com/login", {
+      const apiUrl = import.meta.env.VITE_API_URL;
+
+      const res = await axios.post(`${apiUrl}/login`, {
         email: formData.email,
         password: formData.password,
       });
@@ -43,7 +45,14 @@ export default function LoginForm() {
         alert(res.data.message);
       }
     } catch (error) {
-      alert("Invalid Email or Password");
+      console.error("Login Error:", error);
+
+      if (error.response) {
+        console.error("Backend Response:", error.response.data);
+        alert(error.response.data.message || "Login failed");
+      } else {
+        alert("Backend connection failed");
+      }
     } finally {
       setLoading(false);
     }
@@ -89,7 +98,10 @@ export default function LoginForm() {
 
       <p className="text-center text-gray-400 mt-8">
         Don't have an account?{" "}
-        <Link to="/signup" className="text-blue-500 hover:underline">
+        <Link
+          to="/signup"
+          className="text-blue-500 hover:underline"
+        >
           Sign Up
         </Link>
       </p>

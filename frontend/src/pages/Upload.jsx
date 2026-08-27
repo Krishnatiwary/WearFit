@@ -22,6 +22,16 @@ export default function Upload() {
   };
 
   const handleUpload = async () => {
+    if (!imageFile) {
+      alert("Please select an image");
+      return;
+    }
+
+    if (!name || !category || !color || !season || !occasion) {
+      alert("Please fill all required fields");
+      return;
+    }
+
     const formData = new FormData();
 
     formData.append("file", imageFile);
@@ -33,18 +43,41 @@ export default function Upload() {
     formData.append("occasion", occasion);
 
     try {
-      const res = await axios.post(
-  "https://wearfit-xlgs.onrender.com/upload",
-  formData
-);
+      const token = localStorage.getItem("token");
 
-      alert(res.data.message);
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/upload`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("Upload Response:", res.data);
+
+      alert(res.data.message || "Cloth uploaded successfully");
+
+      // Reset form
+      setImage(null);
+      setImageFile(null);
+      setName("");
+      setCategory("");
+      setColor("");
+      setSeason("");
+      setBrand("");
+      setOccasion("");
     } catch (err) {
-  console.log(err);
-  console.log(err.response);
-  console.log(err.response?.data);
-  alert(JSON.stringify(err.response?.data));
-}
+      console.error("Upload Error:", err);
+      console.error("Backend Response:", err.response?.data);
+
+      alert(
+        err.response?.data?.message ||
+          err.response?.data?.detail ||
+          "Upload failed"
+      );
+    }
   };
 
   return (
@@ -91,20 +124,21 @@ export default function Upload() {
             <option value="Winter">Winter</option>
             <option value="All Season">All Season</option>
           </select>
+
           <select
-  value={occasion}
-  onChange={(e) => setOccasion(e.target.value)}
-  className="w-full p-4 rounded-xl bg-slate-800 text-white"
->
-  <option value="">Select Occasion</option>
-  <option value="College">College</option>
-  <option value="Casual">Casual</option>
-  <option value="Office">Office</option>
-  <option value="Party">Party</option>
-  <option value="Wedding">Wedding</option>
-  <option value="Gym">Gym</option>
-  <option value="Travel">Travel</option>
-</select>
+            value={occasion}
+            onChange={(e) => setOccasion(e.target.value)}
+            className="w-full p-4 rounded-xl bg-slate-800 text-white"
+          >
+            <option value="">Select Occasion</option>
+            <option value="College">College</option>
+            <option value="Casual">Casual</option>
+            <option value="Office">Office</option>
+            <option value="Party">Party</option>
+            <option value="Wedding">Wedding</option>
+            <option value="Gym">Gym</option>
+            <option value="Travel">Travel</option>
+          </select>
 
           <input
             type="text"
@@ -124,6 +158,7 @@ export default function Upload() {
 
           <input
             type="file"
+            accept="image/*"
             onChange={handleImage}
             className="w-full text-white"
           />

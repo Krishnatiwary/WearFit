@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -23,7 +23,7 @@ export default function EditCloth() {
     try {
 
       const res = await axios.get(
-        `https://wearfit-xlgs.onrender.com/cloth/${id}`
+        `http://127.0.0.1:8000/cloth/${id}`
       );
 
       const cloth = res.data.data;
@@ -35,7 +35,7 @@ export default function EditCloth() {
       setOccasion(cloth.occasion || "");
 
       setPreview(
-        `https://wearfit-xlgs.onrender.com/uploads/${cloth.image}`
+        `http://127.0.0.1:8000/uploads/${cloth.image}`
       );
 
     } catch (err) {
@@ -63,7 +63,7 @@ export default function EditCloth() {
       }
 
       await axios.put(
-        `https://wearfit-xlgs.onrender.com/cloth/${id}`,
+        `http://127.0.0.1:8000/cloth/${id}`,
         formData
       );
 

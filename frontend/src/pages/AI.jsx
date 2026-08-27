@@ -10,7 +10,60 @@ export default function AI() {
   const [weather, setWeather] = useState(null);
   const [weatherLoading, setWeatherLoading] = useState(true);
 
-  const API = "https://wearfit-xlgs.onrender.com";
+  const API = "http://127.0.0.1:8000";
+
+  // =========================================================
+  // IMAGE URL
+  // =========================================================
+
+  const getImageUrl = (image) => {
+    if (!image) return "";
+
+    // Support both a plain filename and common image field formats.
+    if (typeof image === "object") {
+      image =
+        image.url ||
+        image.path ||
+        image.filename ||
+        image.fileName ||
+        image.name ||
+        "";
+    }
+
+    let value = String(image).trim();
+    if (!value) return "";
+
+    // If an old localhost URL was saved, keep only its path and rebuild it
+    // using the deployed Render backend.
+    if (value.startsWith("http://") || value.startsWith("https://")) {
+      if (value.includes("localhost") || value.includes("127.0.0.1")) {
+        try {
+          value = new URL(value).pathname;
+        } catch {
+          return value;
+        }
+      } else {
+        return value;
+      }
+    }
+
+    // Normalize Windows-style paths and leading slashes.
+    value = value.replace(/\\/g, "/");
+    value = value.replace(/^\/+/, "");
+
+    // Handle values such as /uploads/file.jpg or uploads/file.jpg.
+    const uploadsIndex = value.toLowerCase().indexOf("uploads/");
+    if (uploadsIndex !== -1) {
+      value = value.slice(uploadsIndex + "uploads/".length);
+    }
+
+    // If a path still contains directories, use the actual filename.
+    if (value.includes("/")) {
+      value = value.split("/").pop();
+    }
+
+    return `${API}/uploads/${encodeURIComponent(value)}`;
+  };
 
   // =========================================================
   // FETCH CLOTHES + WEATHER
@@ -24,6 +77,9 @@ export default function AI() {
   const fetchClothes = async () => {
     try {
       const res = await axios.get(`${API}/clothes`);
+
+      console.log("WARDROBE CLOTHES:", res.data.data);
+
       setClothes(res.data.data || []);
     } catch (err) {
       console.log("Error fetching clothes:", err);
@@ -205,7 +261,6 @@ export default function AI() {
     const type = getType(cloth);
     const season = (cloth.season || "").toLowerCase().trim();
 
-    // Very hot
     if (temperature >= 32) {
       if (
         season === "summer" ||
@@ -219,7 +274,6 @@ export default function AI() {
       return type === "top" || type === "shoes";
     }
 
-    // Hot
     if (temperature >= 30) {
       if (
         season === "summer" ||
@@ -233,7 +287,6 @@ export default function AI() {
       return type === "top";
     }
 
-    // Warm
     if (temperature >= 24) {
       if (
         season === "summer" ||
@@ -247,12 +300,10 @@ export default function AI() {
       return true;
     }
 
-    // Pleasant
     if (temperature >= 18) {
       return true;
     }
 
-    // Cool / Cold
     if (temperature < 18) {
       return (
         season === "winter" ||
@@ -276,7 +327,6 @@ export default function AI() {
     const season = (cloth.season || "").toLowerCase().trim();
     const type = getType(cloth);
 
-    // High humidity
     if (humidity >= 80) {
       if (
         season === "summer" ||
@@ -290,7 +340,6 @@ export default function AI() {
       return type === "top";
     }
 
-    // Normal humidity
     return true;
   };
 
@@ -390,7 +439,8 @@ export default function AI() {
 
     if (
       selected === "party" ||
-      selected === "wedding"
+      selected === "wedding" ||
+      selected === "formal"
     ) {
       return type === "top" || type === "bottom";
     }
@@ -413,32 +463,26 @@ export default function AI() {
 
     const type = getType(cloth);
 
-    // 30 points - occasion
     if (clothOccasion === selectedOccasion) {
       score += 30;
     }
 
-    // 20 points - season
     if (isSeasonCompatible(cloth)) {
       score += 20;
     }
 
-    // 15 points - weather
     if (isWeatherCompatible(cloth)) {
       score += 15;
     }
 
-    // 10 points - humidity
     if (isHumidityCompatible(cloth)) {
       score += 10;
     }
 
-    // 10 points - type suitability
     if (isTypeSuitable(type)) {
       score += 10;
     }
 
-    // 5 points - useful color
     const goodColors = [
       "black",
       "white",
@@ -454,17 +498,14 @@ export default function AI() {
       score += 5;
     }
 
-    // 5 points - brand
     if (cloth.brand) {
       score += 5;
     }
 
-    // 5 points - image exists
     if (cloth.image) {
       score += 5;
     }
 
-    // Hard safety cap for individual clothing score
     return Math.min(Math.round(score), 90);
   };
 
@@ -483,10 +524,6 @@ export default function AI() {
 
     let score = 0;
 
-    // -------------------------
-    // Individual quality
-    // -------------------------
-
     const individualScores = [
       top.score,
       bottom.score,
@@ -501,12 +538,7 @@ export default function AI() {
         0
       ) / individualScores.length;
 
-    // Individual quality contributes 30
     score += individualAverage * 0.30;
-
-    // -------------------------
-    // Occasion
-    // -------------------------
 
     const occasionMatches =
       top.occasion?.toLowerCase() ===
@@ -518,10 +550,6 @@ export default function AI() {
       score += 20;
     }
 
-    // -------------------------
-    // Season
-    // -------------------------
-
     const seasonMatches =
       isSeasonCompatible(top) &&
       isSeasonCompatible(bottom);
@@ -529,10 +557,6 @@ export default function AI() {
     if (seasonMatches) {
       score += 15;
     }
-
-    // -------------------------
-    // Weather
-    // -------------------------
 
     const weatherMatches =
       isWeatherCompatible(top) &&
@@ -542,10 +566,6 @@ export default function AI() {
       score += 10;
     }
 
-    // -------------------------
-    // Humidity
-    // -------------------------
-
     const humidityMatches =
       isHumidityCompatible(top) &&
       isHumidityCompatible(bottom);
@@ -553,10 +573,6 @@ export default function AI() {
     if (humidityMatches) {
       score += 5;
     }
-
-    // -------------------------
-    // Top + Bottom color
-    // -------------------------
 
     if (
       areColorsCompatible(
@@ -566,10 +582,6 @@ export default function AI() {
     ) {
       score += 10;
     }
-
-    // -------------------------
-    // Shoes
-    // -------------------------
 
     if (shoes) {
       if (
@@ -597,14 +609,10 @@ export default function AI() {
       }
     }
 
-    // Complete outfit bonus
     if (top && bottom && shoes) {
       score += 2;
     }
 
-    // IMPORTANT:
-    // Never show 100%
-    // Hard safety cap for complete outfit score
     return Math.min(Math.round(score), 92);
   };
 
@@ -619,12 +627,10 @@ export default function AI() {
   ) => {
     const reasons = [];
 
-    // Occasion
     reasons.push(
       `✅ ${occasion} occasion matched`
     );
 
-    // Weather
     if (weather) {
       reasons.push(
         `🌡️ Current temperature: ${weather.temperature}°C (${getWeatherType()})`
@@ -635,7 +641,6 @@ export default function AI() {
       );
     }
 
-    // Season
     if (
       isSeasonCompatible(top) &&
       isSeasonCompatible(bottom)
@@ -645,7 +650,6 @@ export default function AI() {
       );
     }
 
-    // Weather compatibility
     if (
       isWeatherCompatible(top) &&
       isWeatherCompatible(bottom)
@@ -655,7 +659,6 @@ export default function AI() {
       );
     }
 
-    // Humidity
     if (
       isHumidityCompatible(top) &&
       isHumidityCompatible(bottom)
@@ -665,7 +668,6 @@ export default function AI() {
       );
     }
 
-    // Color
     if (
       areColorsCompatible(
         top?.color,
@@ -681,7 +683,6 @@ export default function AI() {
       );
     }
 
-    // Shoes
     if (shoes) {
       if (
         areColorsCompatible(
@@ -701,7 +702,6 @@ export default function AI() {
       }
     }
 
-    // Occasion-specific
     if (occasion === "Gym") {
       reasons.push(
         "🏋️ Top and bottom are suitable for workout"
@@ -755,7 +755,6 @@ export default function AI() {
     setLoading(true);
     setOutfit(null);
 
-    // Only selected occasion clothes
     const matchingClothes = clothes
       .filter((cloth) => {
         const clothOccasion =
@@ -775,7 +774,6 @@ export default function AI() {
         (a, b) => b.score - a.score
       );
 
-    // Separate categories
     const tops = matchingClothes.filter(
       (cloth) => cloth.type === "top"
     );
@@ -791,21 +789,14 @@ export default function AI() {
     let bestOutfit = null;
     let bestScore = -1;
 
-    // =====================================================
-    // COMPLETE OUTFIT SEARCH
-    // =====================================================
-
     if (
       tops.length > 0 &&
       bottoms.length > 0
     ) {
       tops.forEach((top) => {
         bottoms.forEach((bottom) => {
-
-          // With shoes
           if (shoes.length > 0) {
             shoes.forEach((shoe) => {
-
               const score =
                 calculateOutfitScore(
                   top,
@@ -831,11 +822,8 @@ export default function AI() {
                       role: "Shoes",
                     },
                   ],
-
                   complete: true,
-
                   score,
-
                   reasons:
                     getOutfitReasons(
                       top,
@@ -845,10 +833,7 @@ export default function AI() {
                 };
               }
             });
-          }
-
-          // Without shoes
-          else {
+          } else {
             const score =
               calculateOutfitScore(
                 top,
@@ -870,11 +855,8 @@ export default function AI() {
                     role: "Bottom",
                   },
                 ],
-
                 complete: true,
-
                 score,
-
                 reasons:
                   getOutfitReasons(
                     top,
@@ -939,9 +921,7 @@ export default function AI() {
           complete: false,
 
           score: Math.min(
-            Math.round(
-              averageScore
-            ),
+            Math.round(averageScore),
             85
           ),
 
@@ -965,19 +945,19 @@ export default function AI() {
         reasons: [],
       });
     } else {
-      // Final safety cap before rendering
       bestOutfit.score = Math.min(
         Number(bestOutfit.score) || 0,
         92
       );
 
-      bestOutfit.items = bestOutfit.items.map((item) => ({
-        ...item,
-        score: Math.min(
-          Number(item.score) || 0,
-          90
-        ),
-      }));
+      bestOutfit.items =
+        bestOutfit.items.map((item) => ({
+          ...item,
+          score: Math.min(
+            Number(item.score) || 0,
+            90
+          ),
+        }));
 
       setOutfit(bestOutfit);
     }
@@ -1054,6 +1034,7 @@ export default function AI() {
                 </div>
 
               </div>
+
             </div>
 
             <p className="text-gray-300 mt-5">
@@ -1089,6 +1070,7 @@ export default function AI() {
             }}
             className="w-full mt-3 p-3 rounded-xl bg-slate-800 text-white"
           >
+
             <option value="College">
               College
             </option>
@@ -1120,6 +1102,7 @@ export default function AI() {
             <option value="Travel">
               Travel
             </option>
+
           </select>
 
           <button
@@ -1157,7 +1140,11 @@ export default function AI() {
 
               <p className="text-green-400 text-2xl font-bold">
                 🎯 Overall Outfit Score:{" "}
-                {Math.min(Number(outfit.score) || 0, 92)}%
+                {Math.min(
+                  Number(outfit.score) || 0,
+                  92
+                )}
+                %
               </p>
 
               <p className="text-gray-400 mt-2">
@@ -1222,8 +1209,7 @@ export default function AI() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-              {outfit.items.map(
-                (cloth) => (
+              {outfit.items.map((cloth) => (
 
                 <div
                   key={cloth._id}
@@ -1231,11 +1217,41 @@ export default function AI() {
                 >
 
                   <img
-                    src={`${API}/uploads/${cloth.image}`}
+                    src={getImageUrl(
+                      cloth.image ||
+                      cloth.imageUrl ||
+                      cloth.image_url ||
+                      cloth.photo ||
+                      cloth.photoUrl ||
+                      cloth.file
+                    )}
                     alt={
                       cloth.name ||
-                      cloth.category
+                      cloth.category ||
+                      "Cloth"
                     }
+                    onError={(e) => {
+                      console.log(
+                        "IMAGE FAILED:",
+                        {
+                          image: cloth.image,
+                          imageUrl: cloth.imageUrl,
+                          image_url: cloth.image_url,
+                          photo: cloth.photo,
+                          photoUrl: cloth.photoUrl,
+                          finalUrl: getImageUrl(
+                            cloth.image ||
+                            cloth.imageUrl ||
+                            cloth.image_url ||
+                            cloth.photo ||
+                            cloth.photoUrl ||
+                            cloth.file
+                          ),
+                        }
+                      );
+                      e.currentTarget.style.display =
+                        "none";
+                    }}
                     className="w-full h-64 object-cover rounded-xl"
                   />
 
@@ -1272,7 +1288,11 @@ export default function AI() {
 
                     <p className="text-green-400 font-semibold">
                       AI Match Score:{" "}
-                      {Math.min(Number(cloth.score) || 0, 90)}%
+                      {Math.min(
+                        Number(cloth.score) || 0,
+                        90
+                      )}
+                      %
                     </p>
 
                   </div>

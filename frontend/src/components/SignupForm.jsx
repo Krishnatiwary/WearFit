@@ -3,9 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function SignupForm() {
-  
-
-  
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -26,7 +23,6 @@ export default function SignupForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
 
     if (
       !formData.name ||
@@ -46,21 +42,36 @@ export default function SignupForm() {
     try {
       setLoading(true);
 
-      const res = await axios.post("https://wearfit-xlgs.onrender.com/signup", {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-      });
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/signup`,
+        {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }
+      );
+
+      console.log("Signup Response:", res.data);
 
       if (res.data.success) {
-        alert(res.data.message);
+        alert(res.data.message || "Signup Successful");
         navigate("/login");
       } else {
-        alert(res.data.message);
+        alert(res.data.message || "Signup failed");
       }
     } catch (error) {
-      console.error(error);
-      alert("Signup failed");
+      console.error("Signup Error:", error);
+
+      if (error.response) {
+        console.error("Backend Response:", error.response.data);
+        alert(
+          error.response.data?.message ||
+            error.response.data?.detail ||
+            "Signup failed"
+        );
+      } else {
+        alert("Cannot connect to backend");
+      }
     } finally {
       setLoading(false);
     }
@@ -112,7 +123,6 @@ export default function SignupForm() {
           onChange={handleChange}
           className="w-full p-4 rounded-xl bg-slate-800 text-white outline-none border border-slate-700 focus:border-blue-500"
         />
-        
 
         <button
           type="submit"
