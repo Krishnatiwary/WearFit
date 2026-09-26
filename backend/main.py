@@ -27,10 +27,9 @@ app.add_middleware(
 # Serve uploaded images
 app.mount(
     "/uploads",
-    StaticFiles(directory=os.path.join(BASE_DIR, "uploads")),
+    StaticFiles(directory="uploads"),
     name="uploads",
 )
-
 app.include_router(upload_router)
 app.include_router(auth_router)
 
