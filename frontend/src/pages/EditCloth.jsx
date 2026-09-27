@@ -23,7 +23,7 @@ export default function EditCloth() {
     try {
 
       const res = await axios.get(
-        `http://127.0.0.1:8000/cloth/${id}`
+        `https://wearfit-xlgs.onrender.com/cloth/${id}`
       );
 
       const cloth = res.data.data;
@@ -35,7 +35,7 @@ export default function EditCloth() {
       setOccasion(cloth.occasion || "");
 
       setPreview(
-        `http://127.0.0.1:8000/uploads/${cloth.image}`
+        `https://wearfit-xlgs.onrender.com/uploads/${cloth.image}`
       );
 
     } catch (err) {
@@ -63,7 +63,7 @@ export default function EditCloth() {
       }
 
       await axios.put(
-        `http://127.0.0.1:8000/cloth/${id}`,
+        `https://wearfit-xlgs.onrender.com/cloth/${id}`,
         formData
       );
 
