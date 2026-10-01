@@ -27,6 +27,7 @@ async def signup_user(user):
         "name": user.name,
         "email": user.email,
         "password": hashed,
+        "profile_public": False
     }
 
     user_collection.insert_one(user_data)

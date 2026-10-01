@@ -6,6 +6,7 @@ import os
 from database.database import db
 from routes.upload import router as upload_router
 from routes.auth import router as auth_router
+from routes.profile import router as profile_router
 from notifications import get_daily_outfit_message
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -16,9 +17,9 @@ app = FastAPI(title="WearFit API")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-    "http://localhost:5173",
-    "https://wear-fit-opal.vercel.app",
-],
+        "http://localhost:5173",
+        "https://wear-fit-opal.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -30,14 +31,18 @@ app.mount(
     StaticFiles(directory="uploads"),
     name="uploads",
 )
+
 app.include_router(upload_router)
 app.include_router(auth_router)
+app.include_router(profile_router)
+
 
 @app.get("/")
 def home():
     return {
         "message": "Welcome to WearFit Backend 🚀"
     }
+
 
 @app.get("/notifications/daily")
 def daily_notification():

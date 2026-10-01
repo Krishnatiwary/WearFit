@@ -1,10 +1,11 @@
-from fastapi import APIRouter, UploadFile, File, Form
+from fastapi import APIRouter, UploadFile, File, Form, Depends
 from typing import Optional
 import os
 import shutil
 from uuid import uuid4
 from bson import ObjectId
 from database.database import cloth_collection
+from utils.auth_dependency import get_current_user
 
 print("✅ upload.py loaded")
 
@@ -20,6 +21,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 @router.post("/upload")
 async def upload_cloth(
     file: UploadFile = File(...),
+    user_id: str = Depends(get_current_user),
     name: str = Form(...),
     category: str = Form(...),
     color: str = Form(...),
@@ -34,6 +36,7 @@ async def upload_cloth(
         shutil.copyfileobj(file.file, buffer)
 
     cloth_data = {
+        "user_id": user_id,
         "name": name,
         "image": filename,
         "category": category,
@@ -58,11 +61,12 @@ async def upload_cloth(
 # Get All Clothes
 # ==========================
 @router.get("/clothes")
-async def get_clothes():
-
+async def get_clothes(
+    user_id: str = Depends(get_current_user)
+):
     clothes = []
 
-    for cloth in cloth_collection.find():
+    for cloth in cloth_collection.find({"user_id": user_id}):
         cloth["_id"] = str(cloth["_id"])
         clothes.append(cloth)
 
@@ -77,10 +81,15 @@ async def get_clothes():
 # Get Single Cloth
 # ==========================
 @router.get("/cloth/{cloth_id}")
-async def get_single_cloth(cloth_id: str):
-
+async def get_single_cloth(
+    cloth_id: str,
+    user_id: str = Depends(get_current_user)
+):
     try:
-        cloth = cloth_collection.find_one({"_id": ObjectId(cloth_id)})
+        cloth = cloth_collection.find_one({
+            "_id": ObjectId(cloth_id),
+            "user_id": user_id
+        })
 
         if not cloth:
             return {
@@ -106,10 +115,15 @@ async def get_single_cloth(cloth_id: str):
 # Delete Cloth
 # ==========================
 @router.delete("/cloth/{cloth_id}")
-async def delete_cloth(cloth_id: str):
-
+async def delete_cloth(
+    cloth_id: str,
+    user_id: str = Depends(get_current_user)
+):
     try:
-        cloth = cloth_collection.find_one({"_id": ObjectId(cloth_id)})
+        cloth = cloth_collection.find_one({
+            "_id": ObjectId(cloth_id),
+            "user_id": user_id
+        })
 
         if not cloth:
             return {
@@ -118,12 +132,18 @@ async def delete_cloth(cloth_id: str):
             }
 
         if "image" in cloth:
-            image_path = os.path.join(UPLOAD_DIR, cloth["image"])
+            image_path = os.path.join(
+                UPLOAD_DIR,
+                cloth["image"]
+            )
 
             if os.path.exists(image_path):
                 os.remove(image_path)
 
-        result = cloth_collection.delete_one({"_id": ObjectId(cloth_id)})
+        result = cloth_collection.delete_one({
+            "_id": ObjectId(cloth_id),
+            "user_id": user_id
+        })
 
         if result.deleted_count == 0:
             return {
@@ -146,12 +166,10 @@ async def delete_cloth(cloth_id: str):
 # ==========================
 # Update Cloth
 # ==========================
-# ==========================
-# Update Cloth
-# ==========================
 @router.put("/cloth/{cloth_id}")
 async def update_cloth(
     cloth_id: str,
+    user_id: str = Depends(get_current_user),
     name: Optional[str] = Form(None),
     category: Optional[str] = Form(None),
     color: Optional[str] = Form(None),
@@ -162,9 +180,10 @@ async def update_cloth(
 ):
     try:
 
-        cloth = cloth_collection.find_one(
-            {"_id": ObjectId(cloth_id)}
-        )
+        cloth = cloth_collection.find_one({
+            "_id": ObjectId(cloth_id),
+            "user_id": user_id
+        })
 
         if not cloth:
             return {
@@ -205,6 +224,7 @@ async def update_cloth(
                     os.remove(old_image)
 
             filename = f"{uuid4()}_{file.filename}"
+
             file_path = os.path.join(
                 UPLOAD_DIR,
                 filename
@@ -221,11 +241,17 @@ async def update_cloth(
         print("================================")
         print("UPDATED DATA:", updated_data)
         print("OCCASION:", occasion)
+        print("USER ID:", user_id)
         print("================================")
 
         result = cloth_collection.update_one(
-            {"_id": ObjectId(cloth_id)},
-            {"$set": updated_data}
+            {
+                "_id": ObjectId(cloth_id),
+                "user_id": user_id
+            },
+            {
+                "$set": updated_data
+            }
         )
 
         print("MODIFIED COUNT:", result.modified_count)
@@ -250,20 +276,36 @@ async def update_cloth(
 # Dashboard Stats
 # ==========================
 @router.get("/dashboard/stats")
-async def dashboard_stats():
+async def dashboard_stats(
+    user_id: str = Depends(get_current_user)
+):
 
-    total_clothes = cloth_collection.count_documents({})
+    total_clothes = cloth_collection.count_documents({
+        "user_id": user_id
+    })
 
     shirts = cloth_collection.count_documents({
-        "category": {"$regex": "^shirt$", "$options": "i"}
+        "user_id": user_id,
+        "category": {
+            "$regex": "^shirt$",
+            "$options": "i"
+        }
     })
 
     tshirts = cloth_collection.count_documents({
-        "category": {"$regex": "^tshirt$", "$options": "i"}
+        "user_id": user_id,
+        "category": {
+            "$regex": "^tshirt$",
+            "$options": "i"
+        }
     })
 
     pants = cloth_collection.count_documents({
-        "category": {"$regex": "^pant$", "$options": "i"}
+        "user_id": user_id,
+        "category": {
+            "$regex": "^pant$",
+            "$options": "i"
+        }
     })
 
     return {
