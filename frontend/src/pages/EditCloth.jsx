@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function EditCloth() {
-
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -21,33 +20,40 @@ export default function EditCloth() {
 
   const fetchCloth = async () => {
     try {
+      const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        `https://wearfit-xlgs.onrender.com/cloth/${id}`
+        `https://wearfit-xlgs.onrender.com/cloth/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       const cloth = res.data.data;
 
-      setCategory(cloth.category);
-      setColor(cloth.color);
-      setSeason(cloth.season);
-      setBrand(cloth.brand);
+      setCategory(cloth.category || "");
+      setColor(cloth.color || "");
+      setSeason(cloth.season || "");
+      setBrand(cloth.brand || "");
       setOccasion(cloth.occasion || "");
 
       setPreview(
-        `https://wearfit-xlgs.onrender.com/uploads/${cloth.image}`
+        `https://wearfit-xlgs.onrender.com/uploads/${encodeURIComponent(
+          cloth.image
+        )}`
       );
-
     } catch (err) {
       console.log(err);
     }
   };
 
   const updateCloth = async (e) => {
-
     e.preventDefault();
 
     try {
+      const token = localStorage.getItem("token");
 
       const formData = new FormData();
 
@@ -56,7 +62,6 @@ export default function EditCloth() {
       formData.append("season", season);
       formData.append("brand", brand);
       formData.append("occasion", occasion);
-      console.log("Occasion being sent:", occasion);
 
       if (image) {
         formData.append("file", image);
@@ -64,13 +69,17 @@ export default function EditCloth() {
 
       await axios.put(
         `https://wearfit-xlgs.onrender.com/cloth/${id}`,
-        formData
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       alert("Cloth Updated Successfully.");
 
       navigate("/wardrobe");
-
     } catch (err) {
       console.log(err);
       alert("Update Failed.");
@@ -78,14 +87,11 @@ export default function EditCloth() {
   };
 
   return (
-
     <div className="min-h-screen bg-slate-950 flex justify-center items-center p-10">
-
       <form
         onSubmit={updateCloth}
         className="bg-slate-900 p-8 rounded-2xl w-full max-w-xl"
       >
-
         <h1 className="text-white text-3xl font-bold mb-8">
           Edit Cloth
         </h1>
@@ -101,31 +107,31 @@ export default function EditCloth() {
         <input
           type="text"
           value={category}
-          onChange={(e)=>setCategory(e.target.value)}
+          onChange={(e) => setCategory(e.target.value)}
           placeholder="Category"
           className="w-full p-3 rounded-lg mb-4 bg-slate-800 text-white"
         />
 
         <select
-  value={occasion}
-  onChange={(e) => setOccasion(e.target.value)}
-  className="w-full p-3 rounded-lg mb-4 bg-slate-800 text-white"
->
-  <option value="">Select Occasion</option>
-  <option value="College">College</option>
-  <option value="Casual">Casual</option>
-  <option value="Office">Office</option>
-  <option value="formal">Formal</option>
-  <option value="Party">Party</option>
-  <option value="Wedding">Wedding</option>
-  <option value="Gym">Gym</option>
-  <option value="Travel">Travel</option>
-</select>
+          value={occasion}
+          onChange={(e) => setOccasion(e.target.value)}
+          className="w-full p-3 rounded-lg mb-4 bg-slate-800 text-white"
+        >
+          <option value="">Select Occasion</option>
+          <option value="College">College</option>
+          <option value="Casual">Casual</option>
+          <option value="Office">Office</option>
+          <option value="formal">Formal</option>
+          <option value="Party">Party</option>
+          <option value="Wedding">Wedding</option>
+          <option value="Gym">Gym</option>
+          <option value="Travel">Travel</option>
+        </select>
 
         <input
           type="text"
           value={color}
-          onChange={(e)=>setColor(e.target.value)}
+          onChange={(e) => setColor(e.target.value)}
           placeholder="Color"
           className="w-full p-3 rounded-lg mb-4 bg-slate-800 text-white"
         />
@@ -133,7 +139,7 @@ export default function EditCloth() {
         <input
           type="text"
           value={season}
-          onChange={(e)=>setSeason(e.target.value)}
+          onChange={(e) => setSeason(e.target.value)}
           placeholder="Season"
           className="w-full p-3 rounded-lg mb-4 bg-slate-800 text-white"
         />
@@ -141,26 +147,24 @@ export default function EditCloth() {
         <input
           type="text"
           value={brand}
-          onChange={(e)=>setBrand(e.target.value)}
+          onChange={(e) => setBrand(e.target.value)}
           placeholder="Brand"
           className="w-full p-3 rounded-lg mb-4 bg-slate-800 text-white"
         />
 
         <input
           type="file"
-          onChange={(e)=>setImage(e.target.files[0])}
+          onChange={(e) => setImage(e.target.files[0])}
           className="text-white mb-6"
         />
 
         <button
+          type="submit"
           className="w-full bg-blue-600 py-3 rounded-xl text-white font-semibold hover:bg-blue-700"
         >
           Save Changes
         </button>
-
       </form>
-
     </div>
-
   );
 }

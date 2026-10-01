@@ -10,13 +10,23 @@ export default function Wardrobe() {
   const searchQuery = searchParams.get("search") || "";
 
   const fetchClothes = async () => {
-    try {
-      const res = await axios.get("https://wearfit-xlgs.onrender.com/clothes");
-      setClothes(res.data.data || []);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await axios.get(
+      "https://wearfit-xlgs.onrender.com/clothes",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setClothes(res.data.data || []);
+  } catch (err) {
+    console.log(err);
+  }
+};
 
   useEffect(() => {
     fetchClothes();
