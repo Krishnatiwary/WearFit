@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 
 const defaultSettings = {
-  name: "Krishna Tiwary",
-  email: "tiwarykrishna20@gmail.com",
+  name: "",
+  email: "",
   notifications: true,
   darkMode: true,
 };
@@ -24,6 +24,40 @@ const Settings = () => {
 
   const { name, email, notifications, darkMode } = settings;
 
+  // Load logged-in user's profile
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const token = localStorage.getItem("token");
+
+      if (!token) return;
+
+      try {
+        const response = await fetch(
+          "https://wearfit-xlgs.onrender.com/profile/settings",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await response.json();
+
+        if (data.success && data.data) {
+          setSettings((prev) => ({
+            ...prev,
+            name: data.data.name || "User",
+            email: data.data.email || "",
+          }));
+        }
+      } catch (error) {
+        console.error("Profile fetch error:", error);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
   // Apply theme immediately
   useEffect(() => {
     document.body.style.backgroundColor = darkMode
@@ -34,13 +68,11 @@ const Settings = () => {
       ? "#ffffff"
       : "#0f172a";
 
-    // Save theme immediately
     localStorage.setItem(
       "wearfit_settings",
       JSON.stringify(settings)
     );
 
-    // Tell the rest of the app that theme changed
     window.dispatchEvent(
       new CustomEvent("wearfit-theme-change", {
         detail: { darkMode },
@@ -62,9 +94,10 @@ const Settings = () => {
       "wearfit_settings",
       JSON.stringify(settings)
     );
+
     window.dispatchEvent(
-    new Event("wearfit-settings-change")
-   );
+      new Event("wearfit-settings-change")
+    );
 
     setMessage("Settings saved successfully! ✅");
 
@@ -153,9 +186,7 @@ const Settings = () => {
         <input
           type="text"
           value={name}
-          onChange={(e) =>
-            updateSetting("name", e.target.value)
-          }
+          readOnly
           style={{
             width: "100%",
             padding: "14px",
@@ -167,6 +198,7 @@ const Settings = () => {
             fontSize: "15px",
             marginBottom: "18px",
             outline: "none",
+            cursor: "default",
           }}
         />
 
@@ -183,9 +215,7 @@ const Settings = () => {
         <input
           type="email"
           value={email}
-          onChange={(e) =>
-            updateSetting("email", e.target.value)
-          }
+          readOnly
           style={{
             width: "100%",
             padding: "14px",
@@ -196,6 +226,7 @@ const Settings = () => {
             color: darkMode ? "white" : "#0f172a",
             fontSize: "15px",
             outline: "none",
+            cursor: "default",
           }}
         />
       </div>
