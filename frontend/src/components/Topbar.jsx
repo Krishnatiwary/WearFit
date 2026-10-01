@@ -17,6 +17,44 @@ export default function Topbar() {
   const [notificationsEnabled, setNotificationsEnabled] =
     useState(true);
 
+  const [userName, setUserName] = useState("User");
+
+  // Load logged-in user's profile
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          return;
+        }
+
+        const res = await fetch(
+          "https://wearfit-xlgs.onrender.com/profile/settings",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!res.ok) {
+          throw new Error("Failed to load profile");
+        }
+
+        const data = await res.json();
+
+        if (data.success && data.data?.name) {
+          setUserName(data.data.name);
+        }
+      } catch (error) {
+        console.error("Profile Load Error:", error);
+      }
+    };
+
+    loadUserProfile();
+  }, []);
+
   // Load notification preference
   useEffect(() => {
     const loadNotificationSetting = () => {
@@ -41,7 +79,6 @@ export default function Topbar() {
 
     loadNotificationSetting();
 
-    // Listen for changes from Settings page
     const handleSettingsChange = () => {
       loadNotificationSetting();
     };
@@ -84,46 +121,43 @@ export default function Topbar() {
   };
 
   const showBrowserNotification = async () => {
-  if (!notificationsEnabled) {
-    return;
-  }
-
-  if (!("Notification" in window)) {
-    alert("This browser does not support notifications.");
-    return;
-  }
-
-  try {
-    // Get notification message from backend
-    const res = await fetch(
-      "https://wearfit-xlgs.onrender.com/notifications/daily"
-    );
-
-    if (!res.ok) {
-      throw new Error("Failed to fetch notification");
+    if (!notificationsEnabled) {
+      return;
     }
 
-    const data = await res.json();
-
-    // Ask browser permission
-    if (Notification.permission === "default") {
-      await Notification.requestPermission();
+    if (!("Notification" in window)) {
+      alert("This browser does not support notifications.");
+      return;
     }
 
-    // Show browser notification
-    if (Notification.permission === "granted") {
-      new Notification(data.title, {
-        body: data.message,
-        icon: "/vite.svg",
-      });
-    }
-  } catch (error) {
-    console.error("Notification Error:", error);
-  }
-};
+    try {
+      const res = await fetch(
+        "https://wearfit-xlgs.onrender.com/notifications/daily"
+      );
 
-   const notifications = [
-{
+      if (!res.ok) {
+        throw new Error("Failed to fetch notification");
+      }
+
+      const data = await res.json();
+
+      if (Notification.permission === "default") {
+        await Notification.requestPermission();
+      }
+
+      if (Notification.permission === "granted") {
+        new Notification(data.title, {
+          body: data.message,
+          icon: "/vite.svg",
+        });
+      }
+    } catch (error) {
+      console.error("Notification Error:", error);
+    }
+  };
+
+  const notifications = [
+    {
       id: 1,
       title: "AI Outfit Suggestion",
       message:
@@ -155,12 +189,12 @@ export default function Topbar() {
   };
 
   const handleBellClick = () => {
-  setShowNotifications(!showNotifications);
+    setShowNotifications(!showNotifications);
 
-  if (!showNotifications) {
-    showBrowserNotification();
-  }
-};
+    if (!showNotifications) {
+      showBrowserNotification();
+    }
+  };
 
   return (
     <div className="h-20 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-8 relative">
@@ -168,7 +202,7 @@ export default function Topbar() {
       {/* Left */}
       <div>
         <h2 className="text-2xl font-bold text-white">
-          Welcome, Krishna 👋
+          Welcome, {userName} 👋
         </h2>
 
         <p className="text-gray-400 text-sm">
@@ -181,7 +215,6 @@ export default function Topbar() {
 
         {/* Search */}
         <div className="flex items-center bg-slate-800 rounded-xl px-4 py-2">
-
           <FaSearch className="text-gray-400 mr-2" />
 
           <input
@@ -194,18 +227,13 @@ export default function Topbar() {
             onKeyDown={handleSearch}
             className="bg-transparent outline-none text-white placeholder-gray-400 w-40"
           />
-
         </div>
 
         {/* Notification */}
         <div className="relative">
-
           <button
-            onClick={() => {
-            handleBellClick();
-            showBrowserNotification();
-            }}
-             className="relative"
+            onClick={handleBellClick}
+            className="relative"
           >
             <FaBell
               className={`text-2xl cursor-pointer transition ${
@@ -215,7 +243,6 @@ export default function Topbar() {
               }`}
             />
 
-            {/* Badge only when enabled */}
             {notificationsEnabled && (
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
                 {notifications.length}
@@ -227,9 +254,7 @@ export default function Topbar() {
           {showNotifications && (
             <div className="absolute right-0 top-12 w-96 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl z-50 overflow-hidden">
 
-              {/* Header */}
               <div className="flex items-center justify-between px-5 py-4 border-b border-slate-700">
-
                 <h3 className="text-white font-semibold text-lg">
                   Notifications 🔔
                 </h3>
@@ -242,13 +267,10 @@ export default function Topbar() {
                 >
                   <FaTimes />
                 </button>
-
               </div>
 
-              {/* Disabled */}
               {!notificationsEnabled && (
                 <div className="px-5 py-8 text-center">
-
                   <div className="text-4xl mb-3">
                     🔕
                   </div>
@@ -270,14 +292,11 @@ export default function Topbar() {
                   >
                     Open Settings
                   </button>
-
                 </div>
               )}
 
-              {/* Notifications */}
               {notificationsEnabled && (
                 <div className="max-h-96 overflow-y-auto">
-
                   {notifications.map(
                     (notification) => (
                       <button
@@ -289,7 +308,6 @@ export default function Topbar() {
                         }
                         className="w-full text-left px-5 py-4 flex gap-4 hover:bg-slate-800 transition border-b border-slate-800"
                       >
-
                         <div className="text-2xl">
                           {notification.icon}
                         </div>
@@ -303,17 +321,13 @@ export default function Topbar() {
                             {notification.message}
                           </p>
                         </div>
-
                       </button>
                     )
                   )}
-
                 </div>
               )}
 
-              {/* Footer */}
               <div className="px-5 py-3 bg-slate-950">
-
                 <button
                   onClick={() =>
                     setShowNotifications(false)
@@ -322,12 +336,10 @@ export default function Topbar() {
                 >
                   Close notifications
                 </button>
-
               </div>
 
             </div>
           )}
-
         </div>
 
         {/* Profile */}
@@ -339,7 +351,6 @@ export default function Topbar() {
         />
 
       </div>
-
     </div>
   );
 }
