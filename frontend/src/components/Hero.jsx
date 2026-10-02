@@ -1,7 +1,11 @@
+import { Link } from "react-router-dom";
+
 export default function Hero() {
   return (
-    <section className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 text-white flex items-center">
-
+    <section
+      id="home"
+      className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 text-white flex items-center"
+    >
       <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
 
         {/* Left */}
@@ -22,13 +26,21 @@ export default function Hero() {
           </p>
 
           <div className="mt-10 flex gap-5">
-            <button className="bg-blue-600 hover:bg-blue-700 px-7 py-3 rounded-xl font-semibold">
-              Get Started
-            </button>
 
-            <button className="border border-gray-500 hover:border-blue-500 px-7 py-3 rounded-xl">
+            <Link
+              to="/login"
+              className="bg-blue-600 hover:bg-blue-700 px-7 py-3 rounded-xl font-semibold"
+            >
+              Get Started
+            </Link>
+
+            <Link
+              to="/upload"
+              className="border border-gray-500 hover:border-blue-500 px-7 py-3 rounded-xl"
+            >
               Upload Clothes
-            </button>
+            </Link>
+
           </div>
 
         </div>
@@ -41,7 +53,6 @@ export default function Hero() {
         </div>
 
       </div>
-
     </section>
   );
 }

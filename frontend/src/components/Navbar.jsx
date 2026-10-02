@@ -6,27 +6,52 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
 
         {/* Logo */}
-        <div className="flex items-center gap-2">
+        <Link to="/" className="flex items-center gap-2">
           <span className="text-3xl">👕</span>
           <h1 className="text-2xl font-bold text-white">
             Wear<span className="text-blue-500">Fit</span>
           </h1>
-        </div>
+        </Link>
 
         {/* Navigation */}
         <ul className="hidden md:flex items-center gap-8 text-gray-300">
-          <li className="cursor-pointer hover:text-blue-400 transition">
-            Home
+
+          <li>
+            <a
+              href="/#home"
+              className="cursor-pointer hover:text-blue-400 transition"
+            >
+              Home
+            </a>
           </li>
-          <li className="cursor-pointer hover:text-blue-400 transition">
-            Features
+
+          <li>
+            <a
+              href="/#features"
+              className="cursor-pointer hover:text-blue-400 transition"
+            >
+              Features
+            </a>
           </li>
-          <li className="cursor-pointer hover:text-blue-400 transition">
-            About
+
+          <li>
+            <a
+              href="/#about"
+              className="cursor-pointer hover:text-blue-400 transition"
+            >
+              About
+            </a>
           </li>
-          <li className="cursor-pointer hover:text-blue-400 transition">
-            Contact
+
+          <li>
+            <a
+              href="/#contact"
+              className="cursor-pointer hover:text-blue-400 transition"
+            >
+              Contact
+            </a>
           </li>
+
         </ul>
 
         <Link

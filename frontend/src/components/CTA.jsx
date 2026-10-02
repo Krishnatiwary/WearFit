@@ -1,6 +1,6 @@
 export default function CTA() {
   return (
-    <section className="bg-gradient-to-r from-blue-600 to-indigo-700 py-24">
+    <section id="contact" className="bg-gradient-to-r from-blue-600 to-indigo-700 py-24">
       <div className="max-w-5xl mx-auto text-center px-6">
 
         <h2 className="text-5xl font-bold text-white">
@@ -14,11 +14,17 @@ export default function CTA() {
 
         <div className="mt-10 flex justify-center gap-5">
 
-          <button className="bg-white text-blue-700 px-8 py-4 rounded-xl font-bold hover:scale-105 transition">
+          <button
+            onClick={() => window.location.href = "/login"}
+            className="bg-white text-blue-700 px-8 py-4 rounded-xl font-bold hover:scale-105 transition"
+          >
             Get Started
           </button>
 
-          <button className="border border-white text-white px-8 py-4 rounded-xl hover:bg-white hover:text-blue-700 transition">
+          <button
+            onClick={() => window.location.href = "/#features"}
+            className="border border-white text-white px-8 py-4 rounded-xl hover:bg-white hover:text-blue-700 transition"
+          >
             Learn More
           </button>
 
