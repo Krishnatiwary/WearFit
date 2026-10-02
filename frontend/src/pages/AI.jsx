@@ -75,16 +75,22 @@ export default function AI() {
   }, []);
 
   const fetchClothes = async () => {
-    try {
-      const res = await axios.get(`${API}/clothes`);
+  try {
+    const token = localStorage.getItem("token");
 
-      console.log("WARDROBE CLOTHES:", res.data.data);
+    const res = await axios.get(`${API}/clothes`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-      setClothes(res.data.data || []);
-    } catch (err) {
-      console.log("Error fetching clothes:", err);
-    }
-  };
+    console.log("WARDROBE CLOTHES:", res.data.data);
+
+    setClothes(res.data.data || []);
+  } catch (err) {
+    console.log("Error fetching clothes:", err);
+  }
+};
 
   const fetchWeather = async () => {
     try {
