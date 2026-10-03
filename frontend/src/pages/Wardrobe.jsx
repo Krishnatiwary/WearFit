@@ -15,14 +15,11 @@ export default function Wardrobe() {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await axios.get(
-        `${API}/clothes`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await axios.get(`${API}/clothes`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       setClothes(res.data.data || []);
     } catch (err) {
@@ -82,7 +79,7 @@ export default function Wardrobe() {
           </p>
         </div>
 
-        {/* Wardrobe Search */}
+        {/* Search */}
         <div className="flex items-center bg-slate-800 rounded-xl px-4 py-3 w-full md:w-80">
 
           <span className="text-gray-400 mr-2">
@@ -116,24 +113,29 @@ export default function Wardrobe() {
       {filteredClothes.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-10">
 
-          {filteredClothes.map((cloth) => (
-            <WardrobeCard
-              key={cloth._id}
-              id={cloth._id}
+          {filteredClothes.map((cloth) => {
 
-              image={
-                String(cloth.image || "").startsWith("http")
-                  ? cloth.image
-                  : `${API}/uploads/${encodeURIComponent(cloth.image)}`
-              }
+            const imageValue = String(cloth.image || "").trim();
 
-              category={cloth.category}
-              color={cloth.color}
-              season={cloth.season}
-              brand={cloth.brand}
-              occasion={cloth.occasion}
-            />
-          ))}
+            const imageUrl =
+              imageValue.startsWith("http://") ||
+              imageValue.startsWith("https://")
+                ? imageValue
+                : `${API}/uploads/${encodeURIComponent(imageValue)}`;
+
+            return (
+              <WardrobeCard
+                key={cloth._id}
+                id={cloth._id}
+                image={imageUrl}
+                category={cloth.category}
+                color={cloth.color}
+                season={cloth.season}
+                brand={cloth.brand}
+                occasion={cloth.occasion}
+              />
+            );
+          })}
 
         </div>
       ) : (
