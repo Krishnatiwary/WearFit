@@ -3,6 +3,8 @@ import axios from "axios";
 import { useSearchParams } from "react-router-dom";
 import WardrobeCard from "../components/WardrobeCard";
 
+const API = import.meta.env.VITE_API_URL;
+
 export default function Wardrobe() {
   const [clothes, setClothes] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -10,23 +12,23 @@ export default function Wardrobe() {
   const searchQuery = searchParams.get("search") || "";
 
   const fetchClothes = async () => {
-  try {
-    const token = localStorage.getItem("token");
+    try {
+      const token = localStorage.getItem("token");
 
-    const res = await axios.get(
-      "https://wearfit-xlgs.onrender.com/clothes",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+      const res = await axios.get(
+        `${API}/clothes`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    setClothes(res.data.data || []);
-  } catch (err) {
-    console.log(err);
-  }
-};
+      setClothes(res.data.data || []);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   useEffect(() => {
     fetchClothes();
@@ -82,6 +84,7 @@ export default function Wardrobe() {
 
         {/* Wardrobe Search */}
         <div className="flex items-center bg-slate-800 rounded-xl px-4 py-3 w-full md:w-80">
+
           <span className="text-gray-400 mr-2">
             🔍
           </span>
@@ -93,6 +96,7 @@ export default function Wardrobe() {
             placeholder="Search clothes..."
             className="bg-transparent outline-none text-white placeholder-gray-400 w-full"
           />
+
         </div>
 
       </div>
@@ -116,7 +120,7 @@ export default function Wardrobe() {
             <WardrobeCard
               key={cloth._id}
               id={cloth._id}
-              image={`https://wearfit-xlgs.onrender.com/uploads/${encodeURIComponent(cloth.image)}`}
+              image={`${API}/uploads/${encodeURIComponent(cloth.image)}`}
               category={cloth.category}
               color={cloth.color}
               season={cloth.season}
@@ -128,6 +132,7 @@ export default function Wardrobe() {
         </div>
       ) : (
         <div className="text-center mt-20">
+
           <div className="text-5xl mb-4">
             👕
           </div>
@@ -139,6 +144,7 @@ export default function Wardrobe() {
           <p className="text-gray-400 mt-2">
             Try searching for another color, brand, category or occasion.
           </p>
+
         </div>
       )}
 

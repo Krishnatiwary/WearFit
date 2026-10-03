@@ -20,8 +20,15 @@ export default function WardrobeCard({
     if (!confirmDelete) return;
 
     try {
+      const token = localStorage.getItem("token");
+
       await axios.delete(
-        `${import.meta.env.VITE_API_URL}/cloth/${id}`
+        `${import.meta.env.VITE_API_URL}/cloth/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       alert("Cloth deleted successfully.");
