@@ -4,13 +4,44 @@ import os
 import shutil
 from uuid import uuid4
 from bson import ObjectId
+
+import cloudinary
+import cloudinary.uploader
+from dotenv import load_dotenv
+
 from database.database import cloth_collection
 from utils.auth_dependency import get_current_user
 
+
+# ==========================
+# Load Environment Variables
+# ==========================
+load_dotenv()
+
+
+# ==========================
+# Cloudinary Configuration
+# ==========================
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+    secure=True
+)
+
+
 print("✅ upload.py loaded")
+print("✅ Cloudinary configured")
+
 
 router = APIRouter()
 
+
+# ==========================
+# Legacy Local Uploads
+# ==========================
+# Old images already present in your local uploads folder
+# are kept working for existing records.
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
@@ -29,32 +60,53 @@ async def upload_cloth(
     brand: str = Form(...),
     occasion: str = Form(...)
 ):
-    filename = f"{uuid4()}_{file.filename}"
-    file_path = os.path.join(UPLOAD_DIR, filename)
+    try:
 
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+        # --------------------------
+        # Upload image to Cloudinary
+        # --------------------------
+        upload_result = cloudinary.uploader.upload(
+            file.file,
+            folder="wearfit/clothes",
+            resource_type="image"
+        )
 
-    cloth_data = {
-        "user_id": user_id,
-        "name": name,
-        "image": filename,
-        "category": category,
-        "color": color,
-        "season": season,
-        "brand": brand,
-        "occasion": occasion,
-    }
+        image_url = upload_result["secure_url"]
+        cloudinary_public_id = upload_result["public_id"]
 
-    result = cloth_collection.insert_one(cloth_data)
+        # --------------------------
+        # Save data in MongoDB
+        # --------------------------
+        cloth_data = {
+            "user_id": user_id,
+            "name": name,
+            "image": image_url,
+            "cloudinary_public_id": cloudinary_public_id,
+            "category": category,
+            "color": color,
+            "season": season,
+            "brand": brand,
+            "occasion": occasion,
+        }
 
-    cloth_data["_id"] = str(result.inserted_id)
+        result = cloth_collection.insert_one(cloth_data)
 
-    return {
-        "success": True,
-        "message": "Image uploaded successfully",
-        "data": cloth_data
-    }
+        cloth_data["_id"] = str(result.inserted_id)
+
+        return {
+            "success": True,
+            "message": "Image uploaded successfully",
+            "data": cloth_data
+        }
+
+    except Exception as e:
+
+        print("UPLOAD ERROR:", e)
+
+        return {
+            "success": False,
+            "error": str(e)
+        }
 
 
 # ==========================
@@ -64,17 +116,28 @@ async def upload_cloth(
 async def get_clothes(
     user_id: str = Depends(get_current_user)
 ):
-    clothes = []
+    try:
 
-    for cloth in cloth_collection.find({"user_id": user_id}):
-        cloth["_id"] = str(cloth["_id"])
-        clothes.append(cloth)
+        clothes = []
 
-    return {
-        "success": True,
-        "count": len(clothes),
-        "data": clothes
-    }
+        for cloth in cloth_collection.find({"user_id": user_id}):
+
+            cloth["_id"] = str(cloth["_id"])
+
+            clothes.append(cloth)
+
+        return {
+            "success": True,
+            "count": len(clothes),
+            "data": clothes
+        }
+
+    except Exception as e:
+
+        return {
+            "success": False,
+            "error": str(e)
+        }
 
 
 # ==========================
@@ -86,6 +149,7 @@ async def get_single_cloth(
     user_id: str = Depends(get_current_user)
 ):
     try:
+
         cloth = cloth_collection.find_one({
             "_id": ObjectId(cloth_id),
             "user_id": user_id
@@ -105,6 +169,7 @@ async def get_single_cloth(
         }
 
     except Exception as e:
+
         return {
             "success": False,
             "error": str(e)
@@ -120,6 +185,7 @@ async def delete_cloth(
     user_id: str = Depends(get_current_user)
 ):
     try:
+
         cloth = cloth_collection.find_one({
             "_id": ObjectId(cloth_id),
             "user_id": user_id
@@ -131,21 +197,52 @@ async def delete_cloth(
                 "message": "Cloth not found"
             }
 
-        if "image" in cloth:
+        # --------------------------
+        # Delete Cloudinary image
+        # --------------------------
+        if cloth.get("cloudinary_public_id"):
+
+            try:
+                cloudinary.uploader.destroy(
+                    cloth["cloudinary_public_id"],
+                    resource_type="image"
+                )
+
+                print("✅ Cloudinary image deleted")
+
+            except Exception as cloud_error:
+
+                print(
+                    "Cloudinary delete error:",
+                    cloud_error
+                )
+
+        # --------------------------
+        # Delete legacy local image
+        # --------------------------
+        elif cloth.get("image"):
+
             image_path = os.path.join(
                 UPLOAD_DIR,
                 cloth["image"]
             )
 
             if os.path.exists(image_path):
+
                 os.remove(image_path)
 
+                print("✅ Local image deleted")
+
+        # --------------------------
+        # Delete MongoDB record
+        # --------------------------
         result = cloth_collection.delete_one({
             "_id": ObjectId(cloth_id),
             "user_id": user_id
         })
 
         if result.deleted_count == 0:
+
             return {
                 "success": False,
                 "message": "Delete failed"
@@ -157,6 +254,9 @@ async def delete_cloth(
         }
 
     except Exception as e:
+
+        print("DELETE ERROR:", e)
+
         return {
             "success": False,
             "error": str(e)
@@ -180,12 +280,16 @@ async def update_cloth(
 ):
     try:
 
+        # --------------------------
+        # Find cloth
+        # --------------------------
         cloth = cloth_collection.find_one({
             "_id": ObjectId(cloth_id),
             "user_id": user_id
         })
 
         if not cloth:
+
             return {
                 "success": False,
                 "message": "Cloth not found"
@@ -193,6 +297,9 @@ async def update_cloth(
 
         updated_data = {}
 
+        # --------------------------
+        # Update text fields
+        # --------------------------
         if name is not None:
             updated_data["name"] = name
 
@@ -211,39 +318,77 @@ async def update_cloth(
         if occasion is not None:
             updated_data["occasion"] = occasion
 
+        # --------------------------
         # New image
+        # --------------------------
         if file:
 
-            if "image" in cloth:
+            # --------------------------
+            # Delete old Cloudinary image
+            # --------------------------
+            if cloth.get("cloudinary_public_id"):
+
+                try:
+
+                    cloudinary.uploader.destroy(
+                        cloth["cloudinary_public_id"],
+                        resource_type="image"
+                    )
+
+                    print("✅ Old Cloudinary image deleted")
+
+                except Exception as cloud_error:
+
+                    print(
+                        "Old Cloudinary delete error:",
+                        cloud_error
+                    )
+
+            # --------------------------
+            # Delete old legacy local image
+            # --------------------------
+            elif cloth.get("image"):
+
                 old_image = os.path.join(
                     UPLOAD_DIR,
                     cloth["image"]
                 )
 
                 if os.path.exists(old_image):
+
                     os.remove(old_image)
 
-            filename = f"{uuid4()}_{file.filename}"
+                    print("✅ Old local image deleted")
 
-            file_path = os.path.join(
-                UPLOAD_DIR,
-                filename
+            # --------------------------
+            # Upload new image to Cloudinary
+            # --------------------------
+            upload_result = cloudinary.uploader.upload(
+                file.file,
+                folder="wearfit/clothes",
+                resource_type="image"
             )
 
-            with open(file_path, "wb") as buffer:
-                shutil.copyfileobj(
-                    file.file,
-                    buffer
-                )
+            new_image_url = upload_result["secure_url"]
 
-            updated_data["image"] = filename
+            new_public_id = upload_result["public_id"]
 
+            updated_data["image"] = new_image_url
+
+            updated_data["cloudinary_public_id"] = new_public_id
+
+        # --------------------------
+        # Debug logs
+        # --------------------------
         print("================================")
         print("UPDATED DATA:", updated_data)
         print("OCCASION:", occasion)
         print("USER ID:", user_id)
         print("================================")
 
+        # --------------------------
+        # Update MongoDB
+        # --------------------------
         result = cloth_collection.update_one(
             {
                 "_id": ObjectId(cloth_id),
@@ -254,7 +399,10 @@ async def update_cloth(
             }
         )
 
-        print("MODIFIED COUNT:", result.modified_count)
+        print(
+            "MODIFIED COUNT:",
+            result.modified_count
+        )
 
         return {
             "success": True,
