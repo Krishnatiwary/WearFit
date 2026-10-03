@@ -120,7 +120,13 @@ export default function Wardrobe() {
             <WardrobeCard
               key={cloth._id}
               id={cloth._id}
-              image={`${API}/uploads/${encodeURIComponent(cloth.image)}`}
+
+              image={
+                String(cloth.image || "").startsWith("http")
+                  ? cloth.image
+                  : `${API}/uploads/${encodeURIComponent(cloth.image)}`
+              }
+
               category={cloth.category}
               color={cloth.color}
               season={cloth.season}
