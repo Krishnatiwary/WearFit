@@ -13,25 +13,33 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 app = FastAPI(title="WearFit API")
 
+# ==========================
 # CORS
+# ==========================
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
         "https://wear-fit-opal.vercel.app",
+        "https://wear-a1cekp7xc-krishnatiwarys-projects.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# ==========================
 # Serve uploaded images
+# ==========================
 app.mount(
     "/uploads",
     StaticFiles(directory="uploads"),
     name="uploads",
 )
 
+# ==========================
+# Routers
+# ==========================
 app.include_router(upload_router)
 app.include_router(auth_router)
 app.include_router(profile_router)
