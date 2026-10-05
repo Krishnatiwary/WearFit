@@ -4,21 +4,18 @@ const reviews = [
     role: "College Student",
     review:
       "WearFit makes choosing outfits super easy. I save so much time every morning.",
-    image: "👨‍🎓",
   },
   {
     name: "Priya Singh",
     role: "Fashion Enthusiast",
     review:
       "The AI suggestions are surprisingly accurate. The interface is beautiful too.",
-    image: "👩",
   },
   {
     name: "Aman Verma",
     role: "Software Engineer",
     review:
       "I finally organized my wardrobe digitally. Amazing experience!",
-    image: "👨‍💻",
   },
 ];
 
@@ -48,7 +45,10 @@ export default function Testimonials() {
               key={index}
               className="bg-slate-900 rounded-3xl p-8 hover:scale-105 transition duration-300"
             >
-              <div className="text-5xl">{user.image}</div>
+
+              <div className="w-14 h-14 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xl">
+                {user.name.charAt(0)}
+              </div>
 
               <h3 className="text-2xl font-bold mt-5">
                 {user.name}
@@ -62,8 +62,8 @@ export default function Testimonials() {
                 "{user.review}"
               </p>
 
-              <div className="text-yellow-400 text-2xl mt-5">
-                ⭐⭐⭐⭐⭐
+              <div className="text-blue-400 text-sm mt-5 font-semibold">
+                Verified User
               </div>
 
             </div>

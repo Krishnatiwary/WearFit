@@ -7,7 +7,7 @@ export default function Navbar() {
 
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
-          <span className="text-3xl">👕</span>
+          <span className="text-3xl"></span>
           <h1 className="text-2xl font-bold text-white">
             Wear<span className="text-blue-500">Fit</span>
           </h1>

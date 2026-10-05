@@ -12,7 +12,7 @@ export default function Hero() {
         <div>
 
           <span className="bg-blue-600 px-4 py-2 rounded-full text-sm">
-            👕 AI Powered Fashion Assistant
+             AI Powered Fashion Assistant
           </span>
 
           <h1 className="text-6xl font-extrabold mt-8 leading-tight">
@@ -48,7 +48,7 @@ export default function Hero() {
         {/* Right */}
         <div className="flex justify-center">
           <div className="w-96 h-96 rounded-3xl bg-slate-800 flex items-center justify-center text-8xl shadow-2xl">
-            👔
+            
           </div>
         </div>
 

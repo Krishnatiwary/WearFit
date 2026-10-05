@@ -423,7 +423,7 @@ const Planner = () => {
             marginBottom: "8px",
           }}
         >
-          Weekly Planner 📅
+          Weekly Planner 
         </h1>
 
         <p
@@ -787,7 +787,7 @@ const Planner = () => {
                       : 1,
                 }}
               >
-                🤖 AI Suggest Outfit
+                 AI Suggest Outfit
               </button>
             </div>
           );
@@ -823,7 +823,7 @@ const Planner = () => {
               "pointer",
           }}
         >
-          💾 Save Weekly Plan
+          Save Weekly Plan
         </button>
 
         <button
@@ -845,7 +845,7 @@ const Planner = () => {
               "pointer",
           }}
         >
-          🗑️ Clear Plan
+         Clear Plan
         </button>
       </div>
     </div>

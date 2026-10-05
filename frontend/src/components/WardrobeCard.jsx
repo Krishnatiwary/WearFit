@@ -46,6 +46,9 @@ export default function WardrobeCard({
         src={image}
         alt={category || "cloth"}
         className="w-full h-64 object-cover rounded-xl"
+        onLoad={() => {
+          console.log("Image loaded:", image);
+        }}
         onError={(e) => {
           console.log("Image failed:", image);
           e.currentTarget.style.display = "none";

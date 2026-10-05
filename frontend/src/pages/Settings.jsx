@@ -78,7 +78,7 @@ const Settings = () => {
         detail: { darkMode },
       })
     );
-  }, [darkMode]);
+  }, [darkMode, settings]);
 
   const updateSetting = (field, value) => {
     setSettings((prev) => ({
@@ -353,7 +353,7 @@ const Settings = () => {
         }}
       >
         <h2 style={{ marginBottom: "15px" }}>
-          🤖 AI Stylist
+         AI Stylist
         </h2>
 
         <p
@@ -366,6 +366,49 @@ const Settings = () => {
           WearFit AI uses your wardrobe, occasion, season
           and weather to recommend suitable outfits.
         </p>
+      </div>
+
+      {/* Report an Issue */}
+      <div
+        style={{
+          background: darkMode ? "#0f172a" : "#ffffff",
+          border: `1px solid ${
+            darkMode ? "#1e293b" : "#cbd5e1"
+          }`,
+          borderRadius: "18px",
+          padding: "25px",
+          marginBottom: "25px",
+        }}
+      >
+        <h2 style={{ marginBottom: "10px" }}>
+          Report an Issue
+        </h2>
+
+        <p
+          style={{
+            color: darkMode ? "#94a3b8" : "#64748b",
+            lineHeight: "1.6",
+            marginBottom: "18px",
+          }}
+        >
+          Facing a problem while using WearFit? Let us know and
+          we will look into it.
+        </p>
+
+        <a
+          href="mailto:tiwarykrishna20@gmail.com?subject=WearFit%20Issue%20Report"
+          style={{
+            display: "inline-block",
+            padding: "12px 20px",
+            borderRadius: "10px",
+            background: "#2563eb",
+            color: "white",
+            textDecoration: "none",
+            fontWeight: "600",
+          }}
+        >
+          Report an Issue
+        </a>
       </div>
 
       {/* Save */}
@@ -382,7 +425,7 @@ const Settings = () => {
           cursor: "pointer",
         }}
       >
-        💾 Save Settings
+        Save Settings
       </button>
     </div>
   );

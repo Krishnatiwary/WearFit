@@ -11,8 +11,7 @@ export default function Topbar() {
   const navigate = useNavigate();
 
   const [search, setSearch] = useState("");
-  const [showNotifications, setShowNotifications] =
-    useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   const [notificationsEnabled, setNotificationsEnabled] =
     useState(true);
@@ -59,9 +58,7 @@ export default function Topbar() {
   useEffect(() => {
     const loadNotificationSetting = () => {
       try {
-        const saved = localStorage.getItem(
-          "wearfit_settings"
-        );
+        const saved = localStorage.getItem("wearfit_settings");
 
         if (saved) {
           const settings = JSON.parse(saved);
@@ -88,10 +85,7 @@ export default function Topbar() {
       handleSettingsChange
     );
 
-    window.addEventListener(
-      "storage",
-      handleSettingsChange
-    );
+    window.addEventListener("storage", handleSettingsChange);
 
     return () => {
       window.removeEventListener(
@@ -162,7 +156,6 @@ export default function Topbar() {
       title: "AI Outfit Suggestion",
       message:
         "Your wardrobe is ready for a new outfit suggestion.",
-      icon: "🤖",
       path: "/ai",
     },
     {
@@ -170,7 +163,6 @@ export default function Topbar() {
       title: "Weekly Planner",
       message:
         "Plan your outfits for the upcoming week.",
-      icon: "📅",
       path: "/planner",
     },
     {
@@ -178,7 +170,6 @@ export default function Topbar() {
       title: "Wardrobe Update",
       message:
         "Check your wardrobe and explore your latest clothes.",
-      icon: "👕",
       path: "/wardrobe",
     },
   ];
@@ -202,7 +193,7 @@ export default function Topbar() {
       {/* Left */}
       <div>
         <h2 className="text-2xl font-bold text-white">
-          Welcome, {userName} 👋
+          Welcome, {userName}
         </h2>
 
         <p className="text-gray-400 text-sm">
@@ -221,9 +212,7 @@ export default function Topbar() {
             type="text"
             placeholder="Search..."
             value={search}
-            onChange={(e) =>
-              setSearch(e.target.value)
-            }
+            onChange={(e) => setSearch(e.target.value)}
             onKeyDown={handleSearch}
             className="bg-transparent outline-none text-white placeholder-gray-400 w-40"
           />
@@ -256,7 +245,7 @@ export default function Topbar() {
 
               <div className="flex items-center justify-between px-5 py-4 border-b border-slate-700">
                 <h3 className="text-white font-semibold text-lg">
-                  Notifications 🔔
+                  Notifications
                 </h3>
 
                 <button
@@ -271,10 +260,6 @@ export default function Topbar() {
 
               {!notificationsEnabled && (
                 <div className="px-5 py-8 text-center">
-                  <div className="text-4xl mb-3">
-                    🔕
-                  </div>
-
                   <p className="text-white font-semibold">
                     Notifications are disabled
                   </p>
@@ -297,33 +282,27 @@ export default function Topbar() {
 
               {notificationsEnabled && (
                 <div className="max-h-96 overflow-y-auto">
-                  {notifications.map(
-                    (notification) => (
-                      <button
-                        key={notification.id}
-                        onClick={() =>
-                          handleNotificationClick(
-                            notification.path
-                          )
-                        }
-                        className="w-full text-left px-5 py-4 flex gap-4 hover:bg-slate-800 transition border-b border-slate-800"
-                      >
-                        <div className="text-2xl">
-                          {notification.icon}
-                        </div>
+                  {notifications.map((notification) => (
+                    <button
+                      key={notification.id}
+                      onClick={() =>
+                        handleNotificationClick(
+                          notification.path
+                        )
+                      }
+                      className="w-full text-left px-5 py-4 flex gap-4 hover:bg-slate-800 transition border-b border-slate-800"
+                    >
+                      <div>
+                        <p className="text-white font-semibold">
+                          {notification.title}
+                        </p>
 
-                        <div>
-                          <p className="text-white font-semibold">
-                            {notification.title}
-                          </p>
-
-                          <p className="text-gray-400 text-sm mt-1">
-                            {notification.message}
-                          </p>
-                        </div>
-                      </button>
-                    )
-                  )}
+                        <p className="text-gray-400 text-sm mt-1">
+                          {notification.message}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
                 </div>
               )}
 
@@ -344,9 +323,7 @@ export default function Topbar() {
 
         {/* Profile */}
         <FaUserCircle
-          onClick={() =>
-            navigate("/settings")
-          }
+          onClick={() => navigate("/settings")}
           className="text-4xl text-blue-500 cursor-pointer hover:text-blue-400 transition"
         />
 

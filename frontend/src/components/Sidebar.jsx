@@ -15,7 +15,7 @@ export default function Sidebar() {
   return (
     <div className="w-64 min-h-screen bg-slate-900 border-r border-slate-800 p-6">
       <h1 className="text-3xl font-bold text-white mb-10">
-        👕 Wear<span className="text-blue-500">Fit</span>
+        Wear<span className="text-blue-500">Fit</span>
       </h1>
 
       <nav className="space-y-4">
@@ -68,9 +68,7 @@ export default function Sidebar() {
         >
           <FaCog />
           Settings
-          </button>
-
-        
+        </button>
       </nav>
 
       <button

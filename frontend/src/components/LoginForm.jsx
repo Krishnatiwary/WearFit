@@ -61,7 +61,7 @@ export default function LoginForm() {
   return (
     <div className="w-full max-w-md bg-slate-900 rounded-3xl p-10 border border-slate-700 shadow-2xl">
       <h1 className="text-4xl font-bold text-center text-white">
-        👕 Wear<span className="text-blue-500">Fit</span>
+        Wear<span className="text-blue-500">Fit</span>
       </h1>
 
       <p className="text-center text-gray-400 mt-2">
