@@ -10,9 +10,8 @@ export default function Hero() {
 
         {/* Left */}
         <div>
-
           <span className="bg-blue-600 px-4 py-2 rounded-full text-sm">
-             AI Powered Fashion Assistant
+            AI Powered Fashion Assistant
           </span>
 
           <h1 className="text-6xl font-extrabold mt-8 leading-tight">
@@ -26,7 +25,6 @@ export default function Hero() {
           </p>
 
           <div className="mt-10 flex gap-5">
-
             <Link
               to="/login"
               className="bg-blue-600 hover:bg-blue-700 px-7 py-3 rounded-xl font-semibold"
@@ -40,15 +38,13 @@ export default function Hero() {
             >
               Upload Clothes
             </Link>
-
           </div>
-
         </div>
 
         {/* Right */}
         <div className="flex justify-center">
           <div className="w-96 h-96 rounded-3xl bg-slate-800 flex items-center justify-center text-8xl shadow-2xl">
-            
+            👔
           </div>
         </div>
 
